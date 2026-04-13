@@ -169,7 +169,7 @@ export default function Home() {
                     ))}
                 </div>
 
-                {visibleCount < filteredProducts.length && (
+                {visibleCount < searchedProducts.length && (
                     <button
                         className="show-more"
                         onClick={() => setVisibleCount(prev => prev + 12)}

@@ -537,10 +537,11 @@ body.light .view-btn { background: #fff3e6; color: black; }
 
 
 @media (max-width: 768px) {
-  .hamburger { display: block; } 
-
   .navbar-center,
-  .navbar-right { display: none; }
+  .navbar-right {
+    display: flex;
+  }
+}
 
   .footer-container { flex-direction: column; text-align: center; }
 
@@ -548,7 +549,7 @@ body.light .view-btn { background: #fff3e6; color: black; }
   .checkout-summary { position: static; }
   .checkout-item { flex-direction: column; }
   .checkout-item-controls { align-items: flex-start; }
-}
+
 
 @media (max-width: 600px) {
   .product-card-actions { flex-direction: column; }
@@ -879,6 +880,7 @@ body.light .view-btn { background: #fff3e6; color: black; }
   border: none;
   background: #f3f3f3;
   font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
 .search-bar {
