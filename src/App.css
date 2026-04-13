@@ -871,3 +871,18 @@ body.light .view-btn { background: #fff3e6; color: black; }
   .hero-carousel { height: 220px; }
   .hero-title { font-size: 1.4rem; }
 }
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #f3f3f3;
+  font-size: 14px;
+}
+
+.search-bar {
+  max-width: 1200px;
+  margin: 18px auto 10px;
+  padding: 0 2rem;
+}

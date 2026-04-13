@@ -65,6 +65,7 @@ export default function Home() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -78,13 +79,14 @@ export default function Home() {
     setVisibleCount(12);
     window.scrollTo({ top: 420, behavior: "smooth" });
 };
-
-    const visibleProducts = filteredProducts.slice(0, visibleCount) ?? [];
+    
+    const searchedProducts = filteredProducts.filter(product => product.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    const visibleProducts = searchedProducts.slice(0, visibleCount) ?? [];
+   
     const totalCartItems = cartItems.reduce((sum, i) => sum + i.quantity, 0);
 
     return (
         <div className="home">
-
             <div className="hero-carousel">
                 {banners.map((banner, index) => (
                     <div
@@ -92,7 +94,6 @@ export default function Home() {
                         className={`hero-slide ${index === currentSlide ? "active" : ""}`}
                         style={{ backgroundImage: `url(${banner.image})` }}
                     >
-                        {/* dark overlay so text is readable over image */}
                         <div className="hero-overlay" />
                         <div className="hero-content">
                             <span className="hero-tag">TRENDING NOW</span>
@@ -117,6 +118,12 @@ export default function Home() {
                         />
                     ))}
                 </div>
+            </div>
+
+            <div className="search-bar">
+            <input type="text" placeholder="Search for products, brands and more" value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
+                   />
             </div>
 
             <div className="container">
@@ -151,7 +158,9 @@ export default function Home() {
                             ? "All Products"
                             : categoryIcons.find(c => c.slug === selectedCategory)?.label || selectedCategory}
                     </h2>
-                    <span className="section-count">{filteredProducts.length} items</span>
+                    <span className="section-count">
+                       {searchedProducts.length} items
+                    </span>
                 </div>
 
                 <div className="product-grid">
