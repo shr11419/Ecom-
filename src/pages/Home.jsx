@@ -1,69 +1,147 @@
+import { useProducts } from "../context/ProductContext";
 import ProductCard from "../components/ProductCard";
-import { useProducts  } from "../context/ProductContext";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+const banners = [
+    {
+        id: 1,
+        title: "New Season Arrivals",
+        subtitle: "Discover the latest trends — up to 50% off",
+        bg: "#1a1a2e",
+        accent: "#ff7a00",
+        tag: "SHOP NOW",
+    },
+    {
+        id: 2,
+        title: "Top Electronics",
+        subtitle: "Premium gadgets at unbeatable prices",
+        bg: "#0f3460",
+        accent: "#ff7a00",
+        tag: "EXPLORE",
+    },
+    {
+        id: 3,
+        title: "Jewellery & More",
+        subtitle: "Handpicked pieces for every occasion",
+        bg: "#2d1b4e",
+        accent: "#ff7a00",
+        tag: "VIEW ALL",
+    },
+];
+
+const categoryIcons = [
+    { label: "Men's Clothing", slug: "men's clothing", emoji: "👔" },
+    { label: "Women's Clothing", slug: "women's clothing", emoji: "👗" },
+    { label: "Electronics", slug: "electronics", emoji: "📱" },
+    { label: "Jewellery", slug: "jewelery", emoji: "💍" },
+];
 
 export default function Home() {
-    const {
-  filteredProducts,
-  categories,
-  selectedCategory,
-  setSelectedCategory
-} = useProducts();
+    const { filteredProducts, setSelectedCategory, selectedCategory } = useProducts();
+    const [visibleCount, setVisibleCount] = useState(12);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const navigate = useNavigate();
 
-  const [visibleCount, setVisibleCount] = useState(10);
-
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
-
-   /* const [products, setProducts] = useState([]);
-
+    // Auto-slide every 3.5 seconds
     useEffect(() => {
-        fetch("https://fakestoreapi.com/products")
-        .then(res => res.json())
-        .then(data => setProducts(data));
-    }, []);*/
+        const timer = setInterval(() => {
+            setCurrentSlide(prev => (prev + 1) % banners.length);
+        }, 3500);
+        return () => clearInterval(timer); // cleanup on unmount
+    }, []);
 
-    if (!filteredProducts.length) {
-  return <p className="loading">Loading products...</p>;
-}
+    const handleCategoryClick = (slug) => {
+        setSelectedCategory(slug);
+        window.scrollTo({ top: 400, behavior: "smooth" });
+    };
+
+    const visibleProducts = filteredProducts.slice(0, visibleCount);
+
     return (
-    <div className="page" >
-        <div className="home-hero">
-            <h1 className="home-title"> Welcome to ShopHub</h1>
-            <p className="home-subtitle">
-                Discover amazing products at great prices
-            </p>
-            </div>
-        <div className="container">
-             <h2 className="page-title"> Our Products </h2>
-            <div className="category-filter"> 
-                <button className={selectedCategory === "all" ? "category-btn active" : "category-btn"} 
-                onClick={() => { setSelectedCategory("all"); setVisibleCount(10);}}> All </button> 
-                {categories.map(category => (
-                    <button key={category} className={selectedCategory === category ? "category-btn active" : "category-btn"} onClick={() => { setSelectedCategory(category); setVisibleCount(10);}}> {category}</button>
+        <div className="home">
+
+            {/* ===== HERO CAROUSEL ===== */}
+            <div className="hero-carousel">
+                {banners.map((banner, index) => (
+                    <div
+                        key={banner.id}
+                        className={`hero-slide ${index === currentSlide ? "active" : ""}`}
+                        style={{ background: banner.bg }}
+                    >
+                        <div className="hero-content">
+                            <span className="hero-tag" style={{ background: banner.accent }}>
+                                TRENDING NOW
+                            </span>
+                            <h1 className="hero-title">{banner.title}</h1>
+                            <p className="hero-subtitle">{banner.subtitle}</p>
+                            <button
+                                className="hero-btn"
+                                style={{ background: banner.accent }}
+                                onClick={() => navigate("/products")}
+                            >
+                                {banner.tag} →
+                            </button>
+                        </div>
+                    </div>
                 ))}
+
+                {/* Dots */}
+                <div className="hero-dots">
+                    {banners.map((_, i) => (
+                        <button
+                            key={i}
+                            className={`hero-dot ${i === currentSlide ? "active" : ""}`}
+                            onClick={() => setCurrentSlide(i)}
+                        />
+                    ))}
+                </div>
             </div>
-            <div className="product-grid">
-          {visibleProducts.map(product => (
-            <ProductCard
-              key={product.id}
-              product={product}
-            />
-          ))}
+
+            {/* ===== CATEGORY QUICK LINKS ===== */}
+            <div className="container">
+                <div className="category-strip">
+                    <button
+                        className={`cat-pill ${selectedCategory === "all" ? "active" : ""}`}
+                        onClick={() => setSelectedCategory("all")}
+                    >
+                        🛍️ All
+                    </button>
+                    {categoryIcons.map(cat => (
+                        <button
+                            key={cat.slug}
+                            className={`cat-pill ${selectedCategory === cat.slug ? "active" : ""}`}
+                            onClick={() => handleCategoryClick(cat.slug)}
+                        >
+                            {cat.emoji} {cat.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* ===== PRODUCTS SECTION ===== */}
+                <div className="section-header">
+                    <h2 className="section-title">
+                        {selectedCategory === "all" ? "All Products" : selectedCategory}
+                    </h2>
+                    <span className="section-count">{filteredProducts.length} items</span>
+                </div>
+
+                <div className="product-grid">
+                    {visibleProducts.map(product => (
+                        <ProductCard key={product.id} product={product} />
+                    ))}
+                </div>
+
+                {/* Show more */}
+                {visibleCount < filteredProducts.length && (
+                    <button
+                        className="show-more"
+                        onClick={() => setVisibleCount(prev => prev + 12)}
+                    >
+                        Load More
+                    </button>
+                )}
+            </div>
         </div>
-        {visibleCount < filteredProducts.length && (
-          <button
-            className="show-more"
-            onClick={() =>
-              setVisibleCount(prev => prev + 10)
-            }
-          >
-            Show More
-          </button>
-        )}
-
-
-             </div>
-            </div>
     );
 }
