@@ -19,12 +19,12 @@ export default function Checkout() {
                         {cartItems.map((item) => (
                             <div className="checkout-item" key={item.id}>
                                 <img 
-                                src={item.product.image}
-                                alt={item.product.name}
+                                src={item.product.thumbnail}
+                                alt={item.product.title}
                                 className="checkout-item-image"
                                 />
                             <div className="checkout-item-details">
-                                <h3 className="checkout-item-name">{item.product.name}</h3>
+                                <h3 className="checkout-item-name">{item.product.title}</h3>
                                 <p className="checkout-item-price">
                                     ${item.product.price} each
                                 </p>

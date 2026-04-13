@@ -30,7 +30,6 @@ export default function ProductDetails() {
   return (
     <div className="page">
 
-  {/* Back button goes HERE */}
   <button
     className="back-btn"
     onClick={() => navigate(-1)}
@@ -42,7 +41,7 @@ export default function ProductDetails() {
     <div className="product-detail">
 
       <div className="product-detail-image">
-        <img src={product.image} alt={product.title} />
+        <img src={product.thumbnail} alt={product.title} />
       </div>
 
       <div className="product-detail-content">
