@@ -14,7 +14,10 @@ export default function ProductProvider({ children }) {
 
     fetch("https://dummyjson.com/products/categories")
       .then(res => res.json())
-      .then(data => setCategories(data.map(c => c.slug)));
+      .then(data => {
+        console.log(data);
+        setCategories(data.map(c => c.slug))
+  });
   }, []);
 
   const filteredProducts = products.filter(product => {
