@@ -356,7 +356,7 @@ body.light .view-btn { background: #fff3e6; color: black; }
   position: absolute;
   top: 90px;
   left: 40px;
-  background: var(--card);
+  color: white;
   border-radius: 6px;
   padding: 6px 10px;
 }

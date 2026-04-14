@@ -121,7 +121,7 @@ export default function Home() {
             </div>
 
             <div className="search-bar">
-            <input type="text" placeholder="Search for products, brands and more" value={searchQuery}
+            <input type="text" placeholder="Search for products, brands and more.." value={searchQuery}
                onChange={(e) => setSearchQuery(e.target.value)}
                    />
             </div>
@@ -173,7 +173,7 @@ export default function Home() {
                         className="show-more"
                         onClick={() => setVisibleCount(prev => prev + 12)}
                     >
-                        Load More
+                        Show More
                     </button>
                 )}
             </div>
