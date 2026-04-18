@@ -8,6 +8,12 @@ export default function AuthProvider({ children }) {
     return email ? { email, name } : null;
   });
 
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+
+  useEffect(() => {
+    if (!user) setShowAuthPrompt(true);
+  }, []);
+
   function signUp(email, password) {
     const users = JSON.parse(localStorage.getItem('users') || "[]");
     if (users.find((u) => u.email === email)) {
@@ -35,6 +41,7 @@ export default function AuthProvider({ children }) {
       localStorage.setItem("currentUserEmail", email);
       const name = localStorage.getItem("currentUserName");
       setUser({ email, name });
+      setShowAuthPrompt(false);
       return { success: true };
     } catch {
       return { success: false, error: "Server error" };
@@ -44,6 +51,7 @@ export default function AuthProvider({ children }) {
   function saveName(name) {
     localStorage.setItem("currentUserName", name);
     setUser(prev => ({ ...prev, name }));
+    setShowAuthPrompt(false);
   }
 
   function logout() {
@@ -51,10 +59,11 @@ export default function AuthProvider({ children }) {
     localStorage.removeItem("currentUserName");
     localStorage.removeItem("token");
     setUser(null);
+    setShowAuthPrompt(true);
   }
 
   return (
-    <AuthContext.Provider value={{ signUp, user, logout, login, saveName }}>
+    <AuthContext.Provider value={{ signUp, user, logout, login, saveName, showAuthPrompt, setShowAuthPrompt }}>
       {children}
     </AuthContext.Provider>
   );

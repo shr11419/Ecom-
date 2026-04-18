@@ -195,9 +195,9 @@ export default function Home() {
           </div>
           <span>Cart</span>
         </Link>
-        <Link to="/auth" className={`bottom-nav-item ${location.pathname === "/auth" ? "active" : ""}`}>
+        <Link to="/profile" className={`bottom-nav-item ${location.pathname === "/profile" ? "active" : ""}`}>
           <FiUser size={22} />
-          <span>{user?.name ? user.name.split(" ")[0] : "Profile"}</span>
+          <span>Profile</span>
         </Link>
       </nav>
     </div>
