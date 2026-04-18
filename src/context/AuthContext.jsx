@@ -1,4 +1,5 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext } from "react"; 
+
 const AuthContext = createContext(null);
 
 export default function AuthProvider({ children }) {
@@ -8,11 +9,9 @@ export default function AuthProvider({ children }) {
     return email ? { email, name } : null;
   });
 
-  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
-
-  useEffect(() => {
-    if (!user) setShowAuthPrompt(true);
-  }, []);
+  const [showAuthPrompt, setShowAuthPrompt] = useState(() => {
+    return !localStorage.getItem("currentUserEmail");
+  });
 
   function signUp(email, password) {
     const users = JSON.parse(localStorage.getItem('users') || "[]");
@@ -63,7 +62,10 @@ export default function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ signUp, user, logout, login, saveName, showAuthPrompt, setShowAuthPrompt }}>
+    <AuthContext.Provider value={{
+      signUp, user, logout, login, saveName,
+      showAuthPrompt, setShowAuthPrompt
+    }}>
       {children}
     </AuthContext.Provider>
   );
