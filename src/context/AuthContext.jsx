@@ -2,11 +2,11 @@ import { createContext, useState, useContext } from "react";
 const AuthContext = createContext(null);
 
 export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(
-    localStorage.getItem("currentUserEmail")
-      ? { email: localStorage.getItem("currentUserEmail") }
-      : null
-  );
+  const [user, setUser] = useState(() => {
+    const email = localStorage.getItem("currentUserEmail");
+    const name = localStorage.getItem("currentUserName");
+    return email ? { email, name } : null;
+  });
 
   function signUp(email, password) {
     const users = JSON.parse(localStorage.getItem('users') || "[]");
@@ -15,8 +15,8 @@ export default function AuthProvider({ children }) {
     }
     users.push({ email, password });
     localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("currentUserEmail", email); 
-    setUser({ email });
+    localStorage.setItem("currentUserEmail", email);
+    setUser({ email, name: null });
     return { success: true };
   }
 
@@ -32,22 +32,29 @@ export default function AuthProvider({ children }) {
         return { success: false, error: "Invalid credentials" };
       }
       localStorage.setItem("token", data.token);
-      localStorage.setItem("currentUserEmail", email); 
-      setUser({ email });
+      localStorage.setItem("currentUserEmail", email);
+      const name = localStorage.getItem("currentUserName");
+      setUser({ email, name });
       return { success: true };
     } catch {
       return { success: false, error: "Server error" };
     }
   }
 
+  function saveName(name) {
+    localStorage.setItem("currentUserName", name);
+    setUser(prev => ({ ...prev, name }));
+  }
+
   function logout() {
     localStorage.removeItem("currentUserEmail");
+    localStorage.removeItem("currentUserName");
     localStorage.removeItem("token");
     setUser(null);
   }
 
   return (
-    <AuthContext.Provider value={{ signUp, user, logout, login }}>
+    <AuthContext.Provider value={{ signUp, user, logout, login, saveName }}>
       {children}
     </AuthContext.Provider>
   );

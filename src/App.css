@@ -888,3 +888,137 @@ body.light .view-btn { background: #fff3e6; color: black; }
   margin: 18px auto 10px;
   padding: 0 2rem;
 }
+
+/* ========== AUTH PAGE ========== */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--bg);
+}
+
+.auth-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+}
+
+.auth-brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ff7a00;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.auth-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.auth-sub {
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+  margin-bottom: 1.8rem;
+}
+
+/* tab switcher */
+.auth-mode-tabs {
+  display: flex;
+  background: #f3f3f3;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 1.5rem;
+  gap: 4px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-tab.active {
+  background: #ff7a00;
+  color: white;
+  font-weight: 600;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #ff7a00;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s;
+  margin-top: 8px;
+}
+
+.auth-submit-btn:hover { background: #e96f00; }
+.auth-submit-btn:active { transform: scale(0.98); }
+.auth-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.auth-switch {
+  margin-top: 1.2rem;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.auth-link {
+  color: #ff7a00;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* override form-label color inside white card */
+.auth-card .form-label { color: #444; }
+.auth-card .form-input {
+  border: 1.5px solid #eee;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 15px;
+  background: #fafafa;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.auth-card .form-input:focus {
+  border-color: #ff7a00;
+  outline: none;
+  background: white;
+}
+
+/* ===== HERO GREETING ===== */
+.hero-greeting {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ff7a00;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 4px 12px;
+  border-radius: 20px;
+  width: fit-content;
+  margin-bottom: 4px;
+}
+
+/* ===== REMOVE OLD SEARCH BAR ===== */
+.search-bar { display: none; }
