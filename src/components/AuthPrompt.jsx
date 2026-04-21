@@ -8,6 +8,7 @@ export default function AuthPrompt() {
     const [step, setStep ] = useState("auth");
     const [error, setError ] = useState(null);
     const [loading, setLoading ] = useState(false);
+    const { loginWithGoogle } = useAuth();
 
     const { register, handleSubmit, formState: {errors} , reset } = useForm();
 
@@ -31,6 +32,12 @@ export default function AuthPrompt() {
             setError(result.error);
         }
     }
+
+    async function handleGoogle() {
+  const result = await loginWithGoogle();
+  if (!result.success) setError(result.error);
+  // onAuthStateChanged handles the rest automatically
+}
 
     function handleNameSubmit(e) {
         e.preventDefault();
@@ -119,6 +126,23 @@ export default function AuthPrompt() {
           <button type="submit" className="auth-prompt-btn" disabled={loading}>
             {loading ? "Please wait..." : mode === "signup" ? "Sign Up" : "Login"}
           </button>
+
+          <div className="auth-divider">
+  <span>or</span>
+</div>
+
+<button
+  type="button"
+  className="google-btn"
+  onClick={handleGoogle}
+>
+  <img
+    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+    width="18"
+    alt="Google"
+  />
+  Continue with Google
+</button>
         </form>
 
         <p className="auth-prompt-switch">

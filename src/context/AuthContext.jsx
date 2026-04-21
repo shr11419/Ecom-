@@ -1,69 +1,138 @@
-import { createContext, useState, useContext } from "react"; 
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,  
+  signOut,                   
+  onAuthStateChanged,           
+  GoogleAuthProvider,               
+  signInWithPopup,                  
+  updateProfile,                    
+} from "firebase/auth";
+import { auth, db } from "../firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const AuthContext = createContext(null);
 
 export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const email = localStorage.getItem("currentUserEmail");
-    const name = localStorage.getItem("currentUserName");
-    return email ? { email, name } : null;
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // wait for Firebase to restore session
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
-  const [showAuthPrompt, setShowAuthPrompt] = useState(() => {
-    return !localStorage.getItem("currentUserEmail");
-  });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // user is logged in — fetch their extra data from Firestore
+        const docRef = doc(db, "users", firebaseUser.uid);
+        const docSnap = await getDoc(docRef);
+        const extraData = docSnap.exists() ? docSnap.data() : {};
 
-  function signUp(email, password) {
-    const users = JSON.parse(localStorage.getItem('users') || "[]");
-    if (users.find((u) => u.email === email)) {
-      return { success: false, error: "Email already exists" };
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName || extraData.name || null,
+          address: extraData.address || "",
+          photoURL: firebaseUser.photoURL || null,
+        });
+        setShowAuthPrompt(false);
+      } else {
+        setUser(null);
+        setShowAuthPrompt(true);
+      }
+      setLoading(false); 
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  async function signUp(email, password) {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      return { success: true };
+    } catch (err) {
+      if (err.code === "auth/email-already-in-use") {
+        return { success: false, error: "Email already in use" };
+      }
+      return { success: false, error: err.message };
     }
-    users.push({ email, password });
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("currentUserEmail", email);
-    setUser({ email, name: null });
-    return { success: true };
   }
 
   async function login(email, password) {
     try {
-      const res = await fetch("https://dummyjson.com/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: email, password })
-      });
-      const data = await res.json();
-      if (!data.token) {
-        return { success: false, error: "Invalid credentials" };
-      }
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("currentUserEmail", email);
-      const name = localStorage.getItem("currentUserName");
-      setUser({ email, name });
-      setShowAuthPrompt(false);
+      await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
-    } catch {
-      return { success: false, error: "Server error" };
+    } catch (err) {
+      if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+        return { success: false, error: "Invalid email or password" };
+      }
+      return { success: false, error: err.message };
     }
   }
 
-  function saveName(name) {
-    localStorage.setItem("currentUserName", name);
-    setUser(prev => ({ ...prev, name }));
-    setShowAuthPrompt(false);
+  async function loginWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   }
 
-  function logout() {
-    localStorage.removeItem("currentUserEmail");
-    localStorage.removeItem("currentUserName");
-    localStorage.removeItem("token");
+  async function saveName(name) {
+    try {
+      await updateProfile(auth.currentUser, { displayName: name });
+
+      await setDoc(doc(db, "users", auth.currentUser.uid), {
+        name,
+        email: auth.currentUser.email,
+      }, { merge: true }); // merge:true means don't overwrite other fields
+
+      setUser(prev => ({ ...prev, name }));
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  async function saveAddress(address) {
+    try {
+      await setDoc(doc(db, "users", auth.currentUser.uid), {
+        address
+      }, { merge: true });
+      setUser(prev => ({ ...prev, address }));
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  async function logout() {
+    await signOut(auth);
     setUser(null);
     setShowAuthPrompt(true);
   }
 
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#0f0f0f",
+        color: "#ff7a00",
+        fontSize: "1.2rem",
+        fontWeight: 600
+      }}>
+        Loading ShopHub...
+      </div>
+    );
+  }
+
   return (
     <AuthContext.Provider value={{
-      signUp, user, logout, login, saveName,
+      user, signUp, login, loginWithGoogle,
+      logout, saveName, saveAddress,
       showAuthPrompt, setShowAuthPrompt
     }}>
       {children}

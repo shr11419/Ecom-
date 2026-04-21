@@ -10,6 +10,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Wishlist from "./pages/Wishlist"; 
 import Profile from "./pages/Profile";
 import { useEffect, useState } from "react";
+import ChatBot from "./components/Chatbot";
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/profile" element={<Profile theme={theme} setTheme={setTheme} />} />
       </Routes>
+      <ChatBot />
 
       <Footer />
 
