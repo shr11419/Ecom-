@@ -1,11 +1,16 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { useProducts } from "./ProductContext";
 /* eslint-disable react-refresh/only-export-components */
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 
+
 export default function CartProvider({ children }) {
   const { getProductById } = useProducts();
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState(()  => {
     try {
       return JSON.parse(localStorage.getItem("cartItems")) || [];
@@ -14,9 +19,40 @@ export default function CartProvider({ children }) {
     }
   }); 
 
-  useEffect(() => {
+  /*useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
+  }, [cartItems]);*/
+  useEffect(() => {
+  if (!user) return;
+
+  async function loadCart() {
+    const docRef = doc(db, "users", user.uid);
+
+    const snapshot = await getDoc(docRef);
+
+    if (snapshot.exists()) {
+      setCartItems(snapshot.data().cart || []);
+    }
+  }
+
+  loadCart();
+}, [user]);
+
+useEffect(() => {
+  if (!user) return;
+
+  async function saveCart() {
+    const docRef = doc(db, "users", user.uid);
+
+    await setDoc(
+      docRef,
+      { cart: cartItems },
+      { merge: true }
+    );
+  }
+
+  saveCart();
+}, [cartItems, user]);
 
 
   function addToCart(productId) {

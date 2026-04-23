@@ -10,11 +10,14 @@ import ProductDetails from "./pages/ProductDetails";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import { useEffect, useState } from "react";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "dark"
   );
+
+  const { user } = useAuth();
 
   useEffect(() => {
     document.body.className = theme;
@@ -25,7 +28,7 @@ function App() {
     <div className="app">
       <Navbar theme={theme} setTheme={setTheme} />
       <Routes>
-        <Route path="/" element={<Home theme={theme} setTheme={setTheme} />} />
+        <Route path="/"element={user ? <Home /> : <Auth />}/>
         <Route path="/auth" element={<Auth />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/products/:id" element={<ProductDetails />} />

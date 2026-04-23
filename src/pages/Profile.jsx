@@ -44,7 +44,7 @@ export default function Profile({ theme, setTheme }) {
 
   function handleLogout() {
     logout();
-    navigate("/");
+    navigate("/auth");
   }
 
   const initial = user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase();

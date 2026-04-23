@@ -7,15 +7,15 @@ import ProductProvider from './context/ProductContext.jsx';
 import WishlistProvider from './context/WishlistContext.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <ProductProvider>
-  <WishlistProvider>
-  <CartProvider>
-  <AuthProvider>
-    <BrowserRouter>
-    <App />
-    </BrowserRouter>
+   <AuthProvider>
+    <ProductProvider>
+      <WishlistProvider>
+        <CartProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </CartProvider>
+      </WishlistProvider>
+    </ProductProvider>
   </AuthProvider>
-  </CartProvider>
-  </WishlistProvider>
-  </ProductProvider>
 )
