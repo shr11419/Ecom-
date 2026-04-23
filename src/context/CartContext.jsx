@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import { useProducts } from "./ProductContext";
 /* eslint-disable react-refresh/only-export-components */
 
@@ -6,7 +6,18 @@ const CartContext = createContext(null);
 
 export default function CartProvider({ children }) {
   const { getProductById } = useProducts();
-  const [cartItems, setCartItems] = useState([]); 
+  const [cartItems, setCartItems] = useState(()  => {
+    try {
+      return JSON.parse(localStorage.getItem("cartItems")) || [];
+    } catch {
+      return [];
+    }
+  }); 
+
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
+
 
   function addToCart(productId) {
     console.log("Buttin clcked")

@@ -1,9 +1,20 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const WishlistContext = createContext();
 
 export default function WishlistProvider({children}) {
-    const [wishlistItems, setWishlistItems] = useState([]);
+    const [wishlistItems, setWishlistItems] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("wishlistItems")) || [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("wishlistItems", JSON.stringify(wishlistItems));
+  }, [wishlistItems]);
+
 
     function toggleWishlist(id) {
         setWishlistItems(prev => 

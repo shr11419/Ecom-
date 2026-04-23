@@ -4,29 +4,26 @@ import Auth from "./pages/Auth";
 import Checkout from "./pages/Checkout";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import AuthPrompt from "./components/AuthPrompt";
+import ChatBot from "./components/ChatBot";
 import "./App.css";
 import ProductDetails from "./pages/ProductDetails";
-import Wishlist from "./pages/Wishlist"; 
+import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import { useEffect, useState } from "react";
-import ChatBot from "./components/Chatbot";
 
 function App() {
+  const [theme, setTheme] = useState(
+    localStorage.getItem("theme") || "dark"
+  );
 
-   const [theme, setTheme] = useState( 
-      localStorage.getItem("theme") || "dark"
-   ); 
-
-   useEffect(() => {
-      document.body.className = theme;
-      localStorage.setItem("theme", theme);
-   }, [theme]);
+  useEffect(() => {
+    document.body.className = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   return (
     <div className="app">
-      <AuthPrompt />
-      <Navbar theme={theme} setTheme={setTheme}/>
+      <Navbar theme={theme} setTheme={setTheme} />
       <Routes>
         <Route path="/" element={<Home theme={theme} setTheme={setTheme} />} />
         <Route path="/auth" element={<Auth />} />
@@ -35,10 +32,8 @@ function App() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/profile" element={<Profile theme={theme} setTheme={setTheme} />} />
       </Routes>
-      <ChatBot />
-
       <Footer />
-
+      <ChatBot />
     </div>
   );
 }

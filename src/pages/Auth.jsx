@@ -2,17 +2,18 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
 
 export default function Auth() {
   const [mode, setMode] = useState("signup");
+  const [step, setStep] = useState("auth"); // "auth" | "name"
   const [error, setError] = useState(null);
-  const [step, setStep] = useState("auth"); 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signUp, login, saveName, user } = useAuth();
-
+  const { signUp, login, loginWithGoogle, saveName, user } = useAuth();
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
+  // already logged in with a name — go home
   if (user?.name) {
     navigate("/");
     return null;
@@ -23,15 +24,14 @@ export default function Auth() {
     setLoading(true);
     let result;
     if (mode === "signup") {
-      result = signUp(data.email, data.password);
+      result = await signUp(data.email, data.password);
     } else {
       result = await login(data.email, data.password);
     }
     setLoading(false);
-
     if (result.success) {
       if (mode === "signup") {
-        setStep("name"); // show name step after signup
+        setStep("name");
       } else {
         navigate("/");
       }
@@ -40,35 +40,46 @@ export default function Auth() {
     }
   }
 
-  function handleNameSubmit(e) {
+  async function handleGoogle() {
+    setError(null);
+    setLoading(true);
+    const result = await loginWithGoogle();
+    setLoading(false);
+    if (result.success) {
+      navigate("/");
+    } else {
+      setError(result.error);
+    }
+  }
+
+  async function handleNameSubmit(e) {
     e.preventDefault();
-    const name = e.target.name.value.trim();
+    const name = e.target.username.value.trim();
     if (!name) return;
-    saveName(name);
+    await saveName(name);
     navigate("/");
   }
 
+  // ===== NAME STEP =====
   if (step === "name") {
     return (
       <div className="auth-page">
         <div className="auth-card">
           <div className="auth-brand">ShopHub 🛍️</div>
-          <h2 className="auth-heading">What should we call you?</h2>
+          <div className="auth-emoji">👋</div>
+          <h2 className="auth-heading">What's your name?</h2>
           <p className="auth-sub">We'll use this to personalise your experience</p>
-          <form className="auth-form" onSubmit={handleNameSubmit}>
-            <div className="form-group">
-              <label className="form-label">Your Name</label>
-              <input
-                className="form-input"
-                name="name"
-                type="text"
-                placeholder="e.g. Shritha"
-                autoFocus
-                required
-              />
-            </div>
+          <form className="auth-form-col" onSubmit={handleNameSubmit}>
+            <input
+              className="auth-input"
+              name="username"
+              type="text"
+              placeholder="Enter your name"
+              autoFocus
+              required
+            />
             <button type="submit" className="auth-submit-btn">
-              Let's Go →
+              Start Shopping →
             </button>
           </form>
         </div>
@@ -76,20 +87,23 @@ export default function Auth() {
     );
   }
 
+  // ===== AUTH STEP =====
   return (
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">ShopHub 🛍️</div>
+        <div className="auth-emoji">🛒</div>
         <h2 className="auth-heading">
-          {mode === "signup" ? "Create an account" : "Welcome back"}
+          {mode === "signup" ? "Create account" : "Welcome back"}
         </h2>
         <p className="auth-sub">
           {mode === "signup"
-            ? "Sign up to start shopping"
-            : "Login to continue"}
+            ? "Sign up for a better shopping experience"
+            : "Login to access your cart & wishlist"}
         </p>
 
-        <div className="auth-mode-tabs">
+        {/* Tab switcher */}
+        <div className="auth-tabs">
           <button
             className={`auth-tab ${mode === "signup" ? "active" : ""}`}
             onClick={() => { setMode("signup"); setError(null); reset(); }}
@@ -104,13 +118,13 @@ export default function Auth() {
           </button>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
-          {error && <div className="error-message">{error}</div>}
+        <form className="auth-form-col" onSubmit={handleSubmit(onSubmit)}>
+          {error && <div className="auth-error">{error}</div>}
 
           <div className="form-group">
             <label className="form-label">Email</label>
             <input
-              className="form-input"
+              className="auth-input"
               type="email"
               placeholder="you@example.com"
               {...register("email", { required: "Email is required" })}
@@ -121,13 +135,12 @@ export default function Auth() {
           <div className="form-group">
             <label className="form-label">Password</label>
             <input
-              className="form-input"
+              className="auth-input"
               type="password"
               placeholder="Min 6 characters"
               {...register("password", {
                 required: "Password is required",
                 minLength: { value: 6, message: "At least 6 characters" },
-                maxLength: { value: 12, message: "Max 12 characters" },
               })}
             />
             {errors.password && <span className="form-error">{errors.password.message}</span>}
@@ -138,8 +151,15 @@ export default function Auth() {
           </button>
         </form>
 
+        <div className="auth-divider"><span>or</span></div>
+
+        <button className="google-btn" onClick={handleGoogle} disabled={loading}>
+          <FcGoogle size={20} />
+          Continue with Google
+        </button>
+
         <p className="auth-switch">
-          {mode === "signup" ? "Already have an account? " : "Don't have an account? "}
+          {mode === "signup" ? "Already have an account? " : "New here? "}
           <span
             className="auth-link"
             onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(null); reset(); }}

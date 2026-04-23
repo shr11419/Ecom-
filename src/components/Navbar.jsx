@@ -64,7 +64,7 @@ export default function Navbar({ theme, setTheme }) {
             ) : (
               <button
                 className="navbar-login-btn"
-                onClick={() => setShowAuthPrompt(true)}
+                onClick={() => navigate("/auth")}
               >
                 <FiUser size={15} /> Login / Sign Up
               </button>
